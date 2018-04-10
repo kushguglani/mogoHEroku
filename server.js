@@ -18,17 +18,20 @@ app.post('/saveTodo',(req,res)=>{
     let newTodo = new Todo({
         text:req.body.text
     });
+    console.log(newTodo);
     newTodo.save().then((doc)=>{
+    console.log(doc);
         res.send(doc);
     },(e)=>{
+    console.log(e);
         res.status(400).send(e);
     })
 });
 app.get('/todos',(req,res)=>{
     Todo.find().then((todos)=>{
-        res.send({todos});
+       res.send({todos});
     });
-});
+}); 
 
 app.get('/todo/:id',(request,response)=>{
     let id = request.params.id;
@@ -48,5 +51,5 @@ app.get('/todo/:id',(request,response)=>{
 });
 
 app.listen(port,()=>{
-    console.log(`Server is up on port ${port}`)
+    console.log(`Server is up on port ${port}`);
 });
