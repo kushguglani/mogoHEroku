@@ -14,8 +14,9 @@ app.use(bodyParser.json());
 const port = process.env.PORT || 4000;
 
 app.post('/saveTodo',(req,res)=>{
+    console.log(req.body.text);
     let newTodo = new Todo({
-        text:req.body
+        text:req.body.text
     });
     newTodo.save().then((doc)=>{
         res.send(doc);
