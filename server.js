@@ -6,13 +6,16 @@ const{ObjectID} = require('mongodb');
 const express = require('express');
 const bodyParser = require('body-parser');
 
-const port = process.env.PORT || 3000;
+// console.log(process.env);
+
 const app = express();
 app.use(bodyParser.json());
 
+const port = process.env.PORT || 4000;
+
 app.post('/saveTodo',(req,res)=>{
     let newTodo = new Todo({
-        text:req.body.text
+        text:req.body
     });
     newTodo.save().then((doc)=>{
         res.send(doc);
@@ -46,4 +49,3 @@ app.get('/todo/:id',(request,response)=>{
 app.listen(port,()=>{
     console.log(`Server is up on port ${port}`)
 });
-module.exports= {app};
