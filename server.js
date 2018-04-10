@@ -15,6 +15,7 @@ const port = process.env.PORT || 4000;
 
 app.post('/saveTodo',(req,res)=>{
     console.log(req.body.text);
+
     let newTodo = new Todo({
         text:req.body.text
     });
