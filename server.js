@@ -18,10 +18,11 @@ app.post('/saveTodo',(req,res)=>{
     let newTodo = new Todo({
         text:req.body.text
     });
-    console.log(newTodo);
+    // console.log(newTodo);
     newTodo.save().then((doc)=>{
     console.log(doc);
-        res.send(doc);
+    console.log("kush");
+    res.send(doc);
     },(e)=>{
     console.log(e);
         res.status(400).send(e);
