@@ -1,0 +1,49 @@
+const {Todo} = require('./models/todo.js');
+const {User} = require('./models/user.js');
+const {mongoose} = require('./db/mongoose.js');
+
+const{ObjectID} = require('mongodb');
+const express = require('express');
+const bodyParser = require('body-parser');
+
+const port = process.env.PORT || 3000;
+const app = express();
+app.use(bodyParser.json());
+
+app.post('/saveTodo',(req,res)=>{
+    let newTodo = new Todo({
+        text:req.body.text
+    });
+    newTodo.save().then((doc)=>{
+        res.send(doc);
+    },(e)=>{
+        res.status(400).send(e);
+    })
+});
+app.get('/todos',(req,res)=>{
+    Todo.find().then((todos)=>{
+        res.send({todos});
+    });
+});
+
+app.get('/todo/:id',(request,response)=>{
+    let id = request.params.id;
+    console.log(id);
+    response.send(id);
+    if(!ObjectID.isValid(id)){
+        return response.status(404).send();
+    }
+    Todo.findById(id).then((res)=>{
+        if(!res){
+            return response.status(404).send();
+        }
+        response.send(res);
+    }).catch((e)=>{
+       return response.status(400).send();
+    })
+});
+
+app.listen(port,()=>{
+    console.log(`Server is up on port ${port}`)
+});
+module.exports= {app};
