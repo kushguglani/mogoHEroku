@@ -50,6 +50,22 @@ app.get('/todo/:id',(request,response)=>{
     })
 });
 
+app.get('/deleteTodo/:id',(req,res)=>{
+    let id = req.params.id;
+    if(!ObjectID.isValid(id))
+        return res.status(404).send();
+    Todo.findByIdAndRemove(id).then((doc)=>{
+        if(!doc){
+            return res.send(doc);
+        }
+        res.status(200).send(doc);
+    })
+    .catch((e)=>{
+        res.status(400).send();
+    });
+});
+
+
 app.listen(port,()=>{
     console.log(`Server is up on port ${port}`);
 });
