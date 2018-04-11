@@ -102,7 +102,7 @@ app.post('/saveUser', (request, response) => {
         response.header('x-auth',token).send(newUser);
     })
     .catch((e) => {
-        response.status(400).send();
+        response.status(400).send(e);
     });
 });
 
@@ -110,6 +110,16 @@ app.post('/saveUser', (request, response) => {
 app.post('/user/me',authenticate,(request,response)=>{
     response.send(request.user);
 });
+
+app.post('/user/login',(request,response)=>{
+    let body = _.pick(request.body,['email','password']);
+    User.findByCredentials(body.email,body.password).then((user)=>{
+        return user.generateAuthToken().then((token)=>{
+            response.header('x-auth',token).send(user);
+        });
+    })
+    .catch((e)=>{ response.status(400).send(e);})
+})
 
 app.listen(port, () => {
     console.log(`Server is up on port ${port}`);
