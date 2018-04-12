@@ -36,8 +36,14 @@ app.get('/todos', authenticate, (req, res) => {
     Todo.find({
         _creator:req.user._id
     }).then((todos) => {
-        res.send({ todos });
-    });
+        if(todos.length === 0){
+            res.status(404).send();
+        }
+        res.status(200).send(todos);
+    })
+    .catch((e)=>{
+        res.status(401).send(e);
+    })
 });
 
 app.get('/todo/:id', authenticate, (request, response) => {
