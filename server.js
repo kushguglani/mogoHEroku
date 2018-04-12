@@ -17,11 +17,12 @@ app.use(bodyParser.json());
 
 const port = process.env.PORT;
 
-app.post('/saveTodo', (req, res) => {
+app.post('/saveTodo', authenticate, (req, res) => {
     console.log(req.body.text);
 
     let newTodo = new Todo({
-        text: req.body.text
+        text: req.body.text,
+        _creator:req.user._id
     });
     // console.log(newTodo);
     newTodo.save().then((doc) => {
@@ -31,18 +32,24 @@ app.post('/saveTodo', (req, res) => {
         res.status(400).send(e);
     })
 });
-app.get('/todos', (req, res) => {
-    Todo.find().then((todos) => {
+app.get('/todos', authenticate, (req, res) => {
+    Todo.find({
+        _creator:req.user._id
+    }).then((todos) => {
         res.send({ todos });
     });
 });
 
-app.get('/todo/:id', (request, response) => {
+app.get('/todo/:id', authenticate, (request, response) => {
     let id = request.params.id;
     if (!ObjectID.isValid(id)) {
         return response.status(404).send();
     }
-    Todo.findById(id).then((res) => {
+    console.log(request.user._id);
+    Todo.findOne({
+        _id:id,
+        '_creator':request.user._id}).then((res) => {
+        console.log(res);
         if (!res) {
             return response.status(404).send();
         }
@@ -52,15 +59,20 @@ app.get('/todo/:id', (request, response) => {
     })
 });
 
-app.get('/deleteTodo/:id', (req, res) => {
+app.get('/deleteTodo/:id', authenticate,(req, res) => {
     let id = req.params.id;
     if (!ObjectID.isValid(id))
         return res.status(404).send();
-    Todo.findByIdAndRemove(id).then((doc) => {
+    console.log(req.user._id);
+    Todo.findOneAndRemove({
+        _id:id,
+        _creator:req.user._id
+    }).then((doc) => {
+        console.log(doc);
         if (!doc) {
-            return res.send(doc);
+            return res.status(404).send();
         }
-        res.status(200).send(doc);
+        res.status(200).send("deleted");
     })
         .catch((e) => {
             res.status(400).send();
@@ -120,6 +132,17 @@ app.post('/user/login',(request,response)=>{
     })
     .catch((e)=>{ response.status(400).send(e);})
 })
+
+app.delete('/user/me/token',authenticate,(req,res)=>{
+    console.log(req.user);
+    console.log(req.token);
+    req.user.deleteToken(req.token).then(()=>
+    {
+        res.status('200').send("Log Out");
+    },()=>{
+        res.status(400).send();
+    })
+});
 
 app.listen(port, () => {
     console.log(`Server is up on port ${port}`);

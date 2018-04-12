@@ -7,7 +7,7 @@ let authenticate = (request,response,next)=>{
         }
         request.user = user;
         request.token = token;
-        response.send(user);
+        next();
     }) .catch((e)=>{
         response.status(401).send();
     })
